@@ -2,9 +2,12 @@ Myvi
 ======================
 Myvi is a 3D visualization tool, *the name comes from [mayavi](http://code.enthought.com/projects/mayavi/) (Myvi is a lighter one, it also means mine)*, Myvi is not as powerful as Mayavi, but to do some simple work it is enough, what is more, mayavi has a heavy dependence, *vtk, traits, chaco...*, it is difficult to install, has many historical burdens, and did not support wxpython-phoenix. However, myvi just needs ModernGL, supports wxpython-phoenix and you can use Myvi's Manager with any UI Framework (such as  QT) easily.
 
+*Note: ModernGL requires numpy+mkl be installed.*
+
 ## Tutorial
 ### A sigle ball
 ```python
+import myvi
 # give position, r, and color
 vts, fs, ns, cs = myvi.build_ball((100,100,100), 50, (1,0,0))
 
@@ -16,6 +19,8 @@ manager.show('Ball Demo')
 
 ### Random balls with random r and color
 ```python
+import myvi
+import numpy as np
 os = np.random.rand(30).reshape((-1,3))
 rs = np.random.rand(10)/5
 cs = (np.random.rand(10)*255).astype(np.uint8)
@@ -30,6 +35,8 @@ manager.show('Random Balls Demo')
  
  ### Lines
 ```python
+import myvi
+import numpy as np
 vts = np.array([(0,0,0),(1,1,0),(2,1,0),(1,0,0)], dtype=np.float32)
 fs = np.array([(0,1,2),(1,2,3)], dtype=np.uint32)
 ns = np.ones((4,3), dtype=np.float32)
@@ -55,6 +62,8 @@ manager.show('Line Rings')
  
 ### Balls and Lines
 ```python
+import myvi
+import numpy as np
 os = np.random.rand(30).reshape((-1,3))
 rs = np.random.rand(10)/7
 cs = (np.random.rand(10)*255).astype(np.uint8)
@@ -73,6 +82,8 @@ manager.show('Balls Ring Demo')
 
 ### grid and mesh
 ```python
+import myvi
+import numpy as np
 dphi, dtheta = np.pi/20.0, np.pi/20.0  
 [phi,theta] = np.mgrid[0:np.pi+dphi*1.5:dphi,0:2*np.pi+dtheta*1.5:dtheta]  
 m0 = 4; m1 = 3; m2 = 2; m3 = 3; m4 = 6; m5 = 2; m6 = 6; m7 = 4;  
@@ -93,7 +104,12 @@ manager.show('Mesh Demo')
  ![](http://myvi.imagepy.org/imgs/mesh.jpg "mesh")
  
 ### Digital Elevation Model
+*Requires scikit-image*
 ```python
+import myvi
+import numpy as np
+from skimage.io import imread
+
 img = imread('data/dem.png')
 vts, fs, ns, cs = myvi.util.build_surf2d(img, ds=1, k=0.3, sigma=2)
 
@@ -104,10 +120,17 @@ manager.show('DEM Demo')
  ![](http://myvi.imagepy.org/imgs/dem.jpg "dem")
  
 ### Surface from image sequence
+*Requires scikit-image and scipy*
 ```python
+import myvi
+import numpy as np
+from skimage.io import imread
+from glob import glob
+from scipy import ndimage
+
 fs = glob('data/vessel*.png')
 imgs = np.array([imread(i, True) for i in fs])
-imgs = ndimg.gaussian_filter(imgs, 1)
+imgs = ndimage.gaussian_filter(imgs, 1)
 vts, fs, ns, vs = myvi.util.build_surf3d(imgs, 1, 128)
 
 manager = myvi.Manager()
@@ -120,6 +143,9 @@ manager.show('Vessel Demo')
  myvi.Viewer3D is a wxpanel, which contains a manager, implements rendering and is interactive. You can just put the viewer into your program, then you can add objects in.
  
  ```python
+import wx
+from myvi import Viewer3D
+
 class YourFrame(wx.Frame):
 	def __init__(self, parent, title='Frame3D', manager=None):
 		wx.Frame.__init__(...)
@@ -320,7 +346,7 @@ A wx.Panel, which has a Canvas3D, and has a navigation bar, you can embed it in 
 ## About ImagePy
 [https://github.com/Image-Py/imagepy](https://github.com/Image-Py/imagepy)
 
-ImagePy is my opensource image processihng framework. It is the ImageJ of Python, you can wrap any numpy based function esaily. And Myvi is a sub module of ImagePy. You can use Myvi without any code.
+ImagePy is my opensource image processing framework. It is the ImageJ of Python, you can wrap any numpy based function esaily. And Myvi is a sub module of ImagePy. You can use Myvi without any code.
 
 ![](http://myvi.imagepy.org/imgs/tooth.jpg "vessel")
 
